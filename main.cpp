@@ -35,9 +35,7 @@ main()
     cout<<"p's address\t"<<*ppp<<endl;
     cout<<"n's address:\t"<<**ppp<<endl;
     cout<<"n's value:\t"<<***ppp<<endl;
-
-    cout<<"n's value:\t"<<*p<<endl;
     cout<<"n's value:\t"<<**pp<<endl;
-    cout<<"n's value:\t"<<***ppp<<endl;
+    cout<<"n's value:\t"<<*p<<endl;
 }
 
