@@ -18,43 +18,26 @@ main()
     Swap(&s1, &s2);
     cout<<s1<<s2<<endl;
 
-    char ch1[20] = "abcde";// 等价于char *ch1 = "abcde";
-    //等价于 *ch1="abcde"
-    //数组的名字就是一个指针常量：可以赋值给一个指针；
-    char *pc1 = ch1;
+    int **pp;
+    int ***ppp;
+    int *p;
+    int n=123456;
+    p = &n;
+    pp = &p;
+    ppp = &pp;
 
-    cout<<"ch1 started address : "<<&ch1<<endl;
-    cout<<"pc1's address       : "<<&pc1<<endl;
+    cout<<"n's address:\t"<<p<<endl;
+    cout<<"p's address:\t"<<pp<<endl;
+    cout<<"pp's address:\t"<<ppp<<endl;
+    cout<<"ppp's adress:\t"<<&ppp<<endl;
 
+    cout<<"pp's address:\t"<<ppp<<endl;
+    cout<<"p's address\t"<<*ppp<<endl;
+    cout<<"n's address:\t"<<**ppp<<endl;
+    cout<<"n's value:\t"<<***ppp<<endl;
 
-    ++pc1;
-    cout<<"next value of pc1   : "<<pc1<<endl;
-    cout<<"pc1's address       : "<<&pc1<<endl;
-    cout<<"ch1's address       : "<<&ch1<<endl;
-
-    ++pc1;
-    cout<<"next value of pc1   : "<<pc1<<endl;
-    cout<<"pc1's address       : "<<&pc1<<endl;
-    cout<<"ch1's address       : "<<&ch1<<endl;
-
-    cout<<"next value of ch1   : "<<ch1<<endl;
-    cout<<"next value of pc1   : "<<pc1<<endl;
-
-    cout<<"original ch1 of ch1 : "<<ch1<<endl;
-
-    *pc1='m';
-    
-    cout<<"modified ch1 of ch1 : "<<ch1<<endl;
-    cout<<"the value of pc1    : "<<pc1<<endl;
-
-    cout<<"the size of pc1     : "<<sizeof(ch1)<<endl;
-    cout<<"the size of pc1     : "<<sizeof(pc1)<<endl;
-
-    for(int i=0; ch1[i]; i++)
-    {
-        cout<<ch1[i]<<endl;
-    }
-
-
+    cout<<"n's value:\t"<<*p<<endl;
+    cout<<"n's value:\t"<<**pp<<endl;
+    cout<<"n's value:\t"<<***ppp<<endl;
 }
 
