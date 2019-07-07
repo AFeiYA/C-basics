@@ -2,12 +2,25 @@
 #include <cstring>
 using namespace std;
 
+void Swap(char *s1, char *s2)
+{
+    char temp = *s1;
+    *s1 = *s2;
+    *s2 = temp;
+}
+
+
 main()
 {
+    char s1='a';
+    char s2='b';
+    cout<<s1<<s2<<endl;
+    Swap(&s1, &s2);
+    cout<<s1<<s2<<endl;
 
-    //
-    char ch1[20] = "abcde";
-    //ch1 value to *pc1
+    char ch1[20] = "abcde";// 等价于char *ch1 = "abcde";
+    //等价于 *ch1="abcde"
+    //数组的名字就是一个指针常量：可以赋值给一个指针；
     char *pc1 = ch1;
 
     cout<<"ch1 started address : "<<&ch1<<endl;
@@ -41,6 +54,7 @@ main()
     {
         cout<<ch1[i]<<endl;
     }
+
 
 }
 
