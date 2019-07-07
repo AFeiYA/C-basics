@@ -13,19 +13,14 @@ float DistanceBetweenToPoints(float x1,float y1,float x2,float y2)
 
 main()
 {
-    char s1[7] = "Hello ";
-    char s2[7] = "world!";
-    strcat(s1, s2);
-    cout<<s1<<endl;
+    char ch1 = 'a';
+    char *p1 = &ch1;
 
-
-    int n=strlen(s1);
-    cout<<n<<endl;
+    cout<<"original ch1 : "<<ch1<<endl;
    
-    for(int i=0; s1[i]; i++)
-    {
-        s1[i]=s1[i]+1;
-        cout<<s1[i];
-    }
-    cout<<endl<<s1;
+    *p1='m';
+    cout<<"modified ch1 : "<<ch1<<endl;
+    cout<<"p1's address : "<<&p1<<endl;
+    cout<<"the value of *p1 : "<<*p1<<endl;
 }
+
