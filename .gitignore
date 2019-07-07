@@ -1,0 +1,7 @@
+main.exe
+*.sqlite
+*.ipch
+*.suo
+*.db
+.vs/ProjectSettings.json
+.vs/VSWorkspaceState.json
