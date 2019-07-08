@@ -2,34 +2,51 @@
 #include <cstring>
 using namespace std;
 
-struct Date
+void Func()
 {
-    int year;
-    int month;
-    int day;
-};
-
-
-struct Student
+    static int n=65;
+    cout<<n<<endl;
+    n++;
+}
+void Func1()
 {
-    char name[20];
-    unsigned ID;  
-    float score;
-    Date birthday;
-};
+    int n=65;
+    cout<<n<<endl;
+    n++;
+}
 
+char* MyStrtok(char * p, char * sep)
+{
+    static char * start;//start position this time.
+    if(p) start=p;
+    for(;*start&&strchr(sep,*start);++start);//skip sep
+    if(*start==0) return NULL;
+    char * q = start;
+    for(;*start&&!strchr(sep, *start);++start);//skin non sep
+    if(*start){//if not 0, it is a sep, set to 0;
+        *start=0;
+        ++start;//next start position.
+    }
+    return q;
+}
 main()
 {
-    Student stu1;
-    cout<<stu1.birthday.year<<endl;
+    Func();
+    Func();
+    Func();
+    Func1();
+    Func1();
+    Func1();
 
-    Student stu2 = {"Luca",021,3.5,{2000,9,12}};
-    cout<<stu2.birthday.year<<endl;
+    char str1[200]="--MyStrtok--works,well,as yours";
 
-    Student * pStu2;
-    pStu2 = &stu2;
-    cout<<pStu2->name<<endl;
-    cout<<(*pStu2).name<<endl;
+    char *p = MyStrtok(str1, "-, ");
+    while (p)
+    {
+        cout<<p<<endl;
+        p = MyStrtok(NULL, "-, ");
+    }
+    
 
 }
 
