@@ -1,52 +1,59 @@
 #include <iostream>
 #include <cstring>
 using namespace std;
+//选择排序
+void SelectionSort(int a[], int size)
+{
 
-void Func()
-{
-    static int n=65;
-    cout<<n<<endl;
-    n++;
-}
-void Func1()
-{
-    int n=65;
-    cout<<n<<endl;
-    n++;
-}
 
-char* MyStrtok(char * p, char * sep)
-{
-    static char * start;//start position this time.
-    if(p) start=p;
-    for(;*start&&strchr(sep,*start);++start);//skip sep
-    if(*start==0) return NULL;
-    char * q = start;
-    for(;*start&&!strchr(sep, *start);++start);//skin non sep
-    if(*start){//if not 0, it is a sep, set to 0;
-        *start=0;
-        ++start;//next start position.
+    for(int i=0; i<size-1; ++i)
+    {
+        int minElementIndex = i; 
+        for(int j=i+1; j<size;++j)
+        {
+            if(a[minElementIndex]>a[j])
+            {
+                minElementIndex=j;
+            }
+        }
+        int temp = a[i];
+        a[i] = a[minElementIndex];
+        a[minElementIndex] = temp;       
     }
-    return q;
+
 }
+
+//二分查找求方程f(x)=x^3-5x^2+10x-80 = 0的根m, |f(m)|<=10^-6 :f(x)单调递增。
+double f(double x) {return x*x*x-5*x*x+10*x-80;}
+double findRoot(double x1, double x2,  double EPS)
+{
+    double root, y;
+    root = x1+(x2-x1)/2;
+    int triedTimes=1;
+    y=f(root);
+
+    while (abs(y)>EPS)
+    {
+        if(y>0) x2=root;
+        else x1=root;
+        root = x1+(x2-x1)/2;
+        y = f(root);
+        triedTimes++;
+    }  
+    cout<<triedTimes<<endl;
+    return root;
+}
+
+
 main()
 {
-    Func();
-    Func();
-    Func();
-    Func1();
-    Func1();
-    Func1();
-
-    char str1[200]="--MyStrtok--works,well,as yours";
-
-    char *p = MyStrtok(str1, "-, ");
-    while (p)
-    {
-        cout<<p<<endl;
-        p = MyStrtok(NULL, "-, ");
-    }
+    int a[]={1,2,5,8,6,7};
+    SelectionSort(a, sizeof(a)/sizeof(*a));
     
+    cout<<f(0)<<"____"<<f(10)<<endl;
+    double EPS = 1e-7,x1 = 0, x2 = 10; 
+    double root = findRoot(x1,x2,EPS);
+    cout<<"f("<<root<<")="<<f(root)<<endl;
 
 }
 
