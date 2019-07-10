@@ -1,47 +1,44 @@
 #include <iostream>
 #include <cstring>
+#include <algorithm>
 #include <set>
 using namespace std;
 
+# define NUM 6
+
 int main()
 {
-    multiset<int> st;
-    int a[10] = {1, 8, 2, 45, 26, 37, 18, 95, 15, 5};
-    for (int i = 0; i < 10; i++)
+    //char a[NUM] = {'a', 'b', 'c', 'd','f'};
+    char a[NUM] = "abcdf";
+    char b[NUM] = "adbgd";
+    char *p = a;
+    do{
+        cout<<p<<endl;
+    }while (next_permutation(a, a+NUM-1));
+
+    a[3]='f';
+    cout<<p<<endl;
+    set<char> st;
+    for(int i=0; i<NUM-1;++i)
     {
-        st.insert(a[i]);
+        auto result = st.insert(a[i]);
+        if(!result.second)
+        {
+            cout<<*result.first<<" already in list."<<endl;
+        }
+        else
+        {
+            cout<<*result.first<<" added."<<endl;
+        }
+        
     }
-    multiset<int>::iterator i;
-    for (i = st.begin(); i != st.end(); i++)
+    set<char>::iterator i;
+    for(i=st.begin(); i!=st.end();++i)
     {
-        cout << *i << ",";
+        cout<<*i<<",";
     }
-    cout << endl;
 
-    i = st.find(45);
-    if (i == st.end())
-        cout << "not found!" << endl;
-    else
-        cout << "found 45" << endl;
 
-    i = st.lower_bound(16);
-    cout << "16 lower bound is:" << *i << endl;
+    cout<<endl;
 
-    i = st.lower_bound(18);
-    cout << "18 lower bound is:" << *i << endl;
-
-    i = st.upper_bound(16);
-    cout << "16 upper bound is:" << *i << endl;
-
-    i = st.upper_bound(18);
-    cout << "18 upper bound is:" << *i << endl;
-
-    return 0;
 }
-//results:
-// 1,2,5,8,15,18,26,37,45,95,
-// found 45
-// 16 lower bound is:18
-// 18 lower bound is:18
-// 16 upper bound is:18
-// 18 upper bound is:26
