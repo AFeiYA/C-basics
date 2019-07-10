@@ -1,44 +1,90 @@
 #include <iostream>
-#include <cstring>
-#include <algorithm>
-#include <set>
+#include <map>
 using namespace std;
 
-# define NUM 6
+struct StudentInfo
+{
+    int id;
+    char name[20];
+};
+struct Student
+{
+    int score;
+    StudentInfo info;
+};
+
+typedef multimap<int, StudentInfo> MAP_STD;
+
+#define SIZE 5
 
 int main()
 {
-    //char a[NUM] = {'a', 'b', 'c', 'd','f'};
-    char a[NUM] = "abcdf";
-    char b[NUM] = "adbgd";
-    char *p = a;
-    do{
-        cout<<p<<endl;
-    }while (next_permutation(a, a+NUM-1));
+    MAP_STD mp;
+    Student stu;
+    Student studends[SIZE] = {
+        {100, {21, "Tom"}},
+        {90, {22, "Mt"}},
+        {100, {23, "Kind"}},
+        {110, {21, "Luca"}},
+        {101, {21, "Lca"}},
+    };
 
-    a[3]='f';
-    cout<<p<<endl;
-    set<char> st;
-    for(int i=0; i<NUM-1;++i)
+    for (int i = 0; i < SIZE; i++)
     {
-        auto result = st.insert(a[i]);
-        if(!result.second)
-        {
-            cout<<*result.first<<" already in list."<<endl;
-        }
-        else
-        {
-            cout<<*result.first<<" added."<<endl;
-        }
-        
+        mp.insert(make_pair(studends[i].score, studends[i].info));
     }
-    set<char>::iterator i;
-    for(i=st.begin(); i!=st.end();++i)
+    char cmd[20];
+    while (cin >> cmd)
     {
-        cout<<*i<<",";
+        if (cmd[0] == 'A')
+        {
+            cout << "add:id name scoure:" << endl;
+            cin >> stu.info.id >> stu.info.name >> stu.score;
+            mp.insert(make_pair(stu.score, stu.info));
+        }
+        else if (cmd[0] == 'Q')
+        {
+            int score;
+            cout << "query:scoure:" << endl;
+            cin >> score;
+            MAP_STD::iterator p = mp.lower_bound(score);
+            MAP_STD::iterator q = mp.upper_bound(score);
+            if (q == mp.end())
+            {
+                --q;
+                cout<<"Here is the highest score:"<<endl;
+                cout << q->second.name << ":\t" << q->first << endl;
+            }
+
+            else
+            {
+                if (p != mp.begin())
+                {
+                    if (p->first != score)
+                    {
+                        --p;
+                        cout << p->second.name << ":\t" << p->first << endl;
+                    }
+                    else if (p->first == score)
+                    {
+                        for (; p != mp.begin() && p->first == score; --p)
+                        {
+                        }
+                        if (p->first != score)
+                        {
+                            cout << p->second.name << ":\t" << p->first << endl;
+                        }
+                        else
+                        {
+                            cout << "Nobody under :" << score << endl;
+                        }
+                    }
+                }
+                else
+                {
+                    cout << "Nobody under :" << score << endl;
+                }
+            }
+        }
     }
-
-
-    cout<<endl;
-
 }
