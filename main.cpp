@@ -1,19 +1,36 @@
 #include <iostream>
+#include <unordered_map>
+#include <string>
+#include <functional>
 #include <map>
 using namespace std;
 
 struct StudentInfo
 {
     int id;
-    char name[20];
+    string name;
 };
+
+bool operator==(const StudentInfo & stu1, const StudentInfo & stu2) {
+    return stu1.id < stu2.id ;
+}
+
+struct StuHash
+{
+    size_t operator()(StudentInfo const & s) const noexcept
+    {
+        size_t h1 = hash<int>{}(s.id);
+        return h1;
+    }
+};
+
 struct Student
 {
     int score;
     StudentInfo info;
 };
 
-typedef multimap<int, StudentInfo> MAP_STD;
+typedef unordered_map<StudentInfo, int, StuHash>  MAP_STD;
 
 #define SIZE 5
 
@@ -23,68 +40,34 @@ int main()
     Student stu;
     Student studends[SIZE] = {
         {100, {21, "Tom"}},
-        {90, {22, "Mt"}},
-        {100, {23, "Kind"}},
-        {110, {21, "Luca"}},
-        {101, {21, "Lca"}},
+        {90, {23, "Mt"}},
+        {100, {22, "Kind"}},
+        {110, {24, "Luca"}},
+        {101, {25, "Lca"}},
     };
 
     for (int i = 0; i < SIZE; i++)
     {
-        mp.insert(make_pair(studends[i].score, studends[i].info));
+        mp.insert(make_pair(studends[i].info, studends[i].score));
     }
-    char cmd[20];
-    while (cin >> cmd)
-    {
-        if (cmd[0] == 'A')
-        {
-            cout << "add:id name scoure:" << endl;
-            cin >> stu.info.id >> stu.info.name >> stu.score;
-            mp.insert(make_pair(stu.score, stu.info));
-        }
-        else if (cmd[0] == 'Q')
-        {
-            int score;
-            cout << "query:scoure:" << endl;
-            cin >> score;
-            MAP_STD::iterator p = mp.lower_bound(score);
-            MAP_STD::iterator q = mp.upper_bound(score);
-            if (q == mp.end())
-            {
-                --q;
-                cout<<"Here is the highest score:"<<endl;
-                cout << q->second.name << ":\t" << q->first << endl;
-            }
 
-            else
-            {
-                if (p != mp.begin())
-                {
-                    if (p->first != score)
-                    {
-                        --p;
-                        cout << p->second.name << ":\t" << p->first << endl;
-                    }
-                    else if (p->first == score)
-                    {
-                        for (; p != mp.begin() && p->first == score; --p)
-                        {
-                        }
-                        if (p->first != score)
-                        {
-                            cout << p->second.name << ":\t" << p->first << endl;
-                        }
-                        else
-                        {
-                            cout << "Nobody under :" << score << endl;
-                        }
-                    }
-                }
-                else
-                {
-                    cout << "Nobody under :" << score << endl;
-                }
-            }
-        }
+    MAP_STD::iterator p;
+    for(p=mp.begin();p!=mp.end();++p)
+    {
+        cout<<"ID:\t"<<p->first.id
+        <<"\tname:\t"<<p->first.name
+        <<"\tscore:\t"<<p->second<<endl;
     }
 }
+// vscode gcc result：
+// ID:     25      name:   Lca     score:  101
+// ID:     24      name:   Luca    score:  110
+// ID:     22      name:   Kind    score:  100
+// ID:     21      name:   Tom     score:  100
+// ID:     23      name:   Mt      score:  90
+//visual studio result:
+// ID:     21      name:   Tom     score:  100
+// ID:     23      name:   Mt      score:  90
+// ID:     22      name:   Kind    score:  100
+// ID:     24      name:   Luca    score:  110
+// ID:     25      name:   Lca     score:  101
