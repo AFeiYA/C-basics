@@ -1,73 +1,63 @@
+
 #include <iostream>
-#include <unordered_map>
 #include <string>
-#include <functional>
 #include <map>
+#include <set>
+#include <algorithm>
+#include <fstream>
+#include <ctype.h>
+
 using namespace std;
-
-struct StudentInfo
+//简单的统计文本中,单词出现的次数.
+//we're  it's等会简单的移除标点输出were its.
+//使用中午标点会出错。
+struct Word
 {
-    int id;
-    string name;
+    string word;
+    int times;
 };
-
-bool operator==(const StudentInfo & stu1, const StudentInfo & stu2) {
-    return stu1.id < stu2.id ;
-}
-
-struct StuHash
+struct SortByCounts
 {
-    size_t operator()(StudentInfo const & s) const noexcept
+    bool operator()(const Word & w1, const Word & w2)
     {
-        size_t h1 = hash<int>{}(s.id);
-        return h1;
+        if(w1.times!= w2.times)
+            return w1.times>w2.times;
+        else
+            return w1.word<w2.word;
     }
 };
-
-struct Student
-{
-    int score;
-    StudentInfo info;
-};
-
-typedef unordered_map<StudentInfo, int, StuHash>  MAP_STD;
-
-#define SIZE 5
 
 int main()
 {
-    MAP_STD mp;
-    Student stu;
-    Student studends[SIZE] = {
-        {100, {21, "Tom"}},
-        {90, {23, "Mt"}},
-        {100, {22, "Kind"}},
-        {110, {24, "Luca"}},
-        {101, {25, "Lca"}},
-    };
+	ifstream file;
+	file.open("garden.txt");
+	string word, finalWord;
+    map<string, int> wm;//words map
+    set<Word, SortByCounts> wdSt;
+	while (file >> word)
+	{
+		//cout << word << endl;
+		remove_copy_if(word.begin(), word.end(), back_inserter(finalWord), ::ispunct);
+		//cout << finalWord << endl;
+        ++wm[finalWord];//查找finalWord,如果没有添加元素，如果有统计次数+1;
+		finalWord.clear();
+	}
+	file.close();
 
-    for (int i = 0; i < SIZE; i++)
+    map<string, int>::iterator i;
+    for(i=wm.begin();i!=wm.end(); ++i)
     {
-        mp.insert(make_pair(studends[i].info, studends[i].score));
+        //cout<<i->first<<"\t:\t"<<i->second<<endl;
+        Word temp;
+        temp.word = i->first;
+        temp.times = i->second;
+        wdSt.insert(temp);
     }
 
-    MAP_STD::iterator p;
-    for(p=mp.begin();p!=mp.end();++p)
+    set<Word,SortByCounts>::iterator j;
+    for(j=wdSt.begin();j!=wdSt.end();++j)
     {
-        cout<<"ID:\t"<<p->first.id
-        <<"\tname:\t"<<p->first.name
-        <<"\tscore:\t"<<p->second<<endl;
+        cout<<j->word<<"\t:\t"<<j->times<<endl;
     }
+	return 0;
 }
-// vscode gcc result：
-// ID:     25      name:   Lca     score:  101
-// ID:     24      name:   Luca    score:  110
-// ID:     22      name:   Kind    score:  100
-// ID:     21      name:   Tom     score:  100
-// ID:     23      name:   Mt      score:  90
-//visual studio result:
-// ID:     21      name:   Tom     score:  100
-// ID:     23      name:   Mt      score:  90
-// ID:     22      name:   Kind    score:  100
-// ID:     24      name:   Luca    score:  110
-// ID:     25      name:   Lca     score:  101
