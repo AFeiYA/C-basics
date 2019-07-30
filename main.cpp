@@ -1,104 +1,150 @@
 #include <iostream>
 #include <cstring>
+#include <bitset>
 using namespace std;
 /* Enumerative Algorithm.
- 枚举法：假币问题
- 有12 枚硬币。其中有 11 枚真币和 1 枚假币。
- 假币和真币重量不同，但不知道假币比真币轻还是重。
- 现在，用一架天平称了这些币三次，告诉你称的结果，
- 请你找出假币并且确定假币是轻是重（数据保证一定能找出来）。
+课程题目（熄灯问题）：
+– 有一个由按钮组成的矩阵 , 其中每行有 6 个按钮 , 共 5 行
+– 每个按钮的位置上有一盏灯
+– 当按下一个按钮后 , 该按钮以及周围位置 上边 , 下边 , 左边 , 右边 的灯都会改变状态
+– 如果灯原来是点亮的 , 就会被熄灭
+– 如果灯原来是熄灭的 , 则会被点亮
+	•在矩阵 角上 的按钮改变 3 盏灯 的状态
+	•在矩阵 边上 的按钮改变 4 盏灯 的状态
+	•其他的按钮 改变 5 盏灯
+	•与一盏灯毗邻的多个按钮被按下时 一个操作会抵消另一次操作的结果
+	•给定矩阵中每盏灯的初始状态，求一种按按钮方案，使得所有的灯都熄灭
 
- 输入
- 第一行是测试数据组数。
- 每组数据有三行，每行表示一次称量的结果。银币标号为
- A-L 。每次称量的结果用三个以空格隔开的字符串表示：
- 天平左边放置的硬币 天平右边放置的硬币 平衡状态。其
- 中平衡状态用 ``up'', ``down'', 或 `even` 表示 , 分别为右
- 端高、右端低和平衡。天平左右的硬币数总是相等的。
+输入
+– 第一行是一个正整数 N, 表示需要解决的案例数
+– 每个案例由 5 行组成 , 每一行包括 6 个数字
+– 这些数字以空格隔开 , 可以是 0 或 1
+– 0 表示灯的初始状态是 熄灭 的
+– 1 表示灯的初始状态是 点亮 的
 
- 输出
- 输出哪一个标号的银币是假币，并说明它比真币轻还是重。
+输出
+– 对每个案例 , 首先输出一行 ,输出字符串“PUZZLE #m”, 其中 m 是该案例的序号
+– 接着按照该案例的输入格式输出 5 行
+	•1 表示需要把对应的按钮 按下
+	•0 表示 不需要按 对应的按钮
+	•每个数字以一个空格隔开
 
- 输入样例
- 1
- ABCD EFGH even
- ABCI EFJK up
- ABIJ EFGH even
- 输出样例
- K is the counterfeit coin and it is light.
-思路：假设x是假币， 如果三次称量结果都成立，那么x就是假币，否则x是真的。
-称量最大范围一边六个。： abcdef  ghijkl
+样例输入
+1
+0 1 1 0 1 0
+1 0 0 1 1 1
+0 0 1 0 0 1
+1 0 0 1 0 1
+0 1 1 1 0 0
+
+样例输出
+PUZZLE #1
+1 0 1 0 0 1
+1 1 0 1 0 1
+0 0 1 0 1 1
+1 0 0 1 0 0
+0 1 0 0 0 0
+解题思路：在第一行的开关全部按过一遍之后，需要通过第二行的开关熄灭第一行还亮着的灯。
+而且，第一行第i个位置亮着的灯只能通过第二行第i个位置的灯去熄灭，因此，第二列的开关只有一种按法。
+同理，要使用第二行的开关状态确定完毕后，需要使用第三行的开关，去熄灭第二行还亮着的灯，因此，第三列的开关也只有一种按法。
+所以，只需要枚举第一列开关的所有情况（2^6, 最多64四种情况），
+如果存在一种情况，使得所有的灯都熄灭，那么，该解决方案就是问题的一个解。
 */
+//
+char oriLights[7];
+char lights[7];
+char result[7];
 
-char Left[3][7], Right[3][7], Result[3][7];
-bool IsFake(char x, bool isLight);
-
-int main()
+int GetBit(char c, int i)
 {
-    int t;
-    cin >> t;
-    while (t--)
+	return (c >> i) & 1;
+}
+void SetBit(char &c, int i, int v)
+{
+	if (v)
+		c |= (1 << i); //将c的第i位变成1
+	else
+		c &= ~(1 << i); //将c的第i位变成0
+}
+void FlipBit(char &c, int i)
+{
+	c ^= i << 1;
+}
+void OutputResults(int t, char results[], string name)
+{
+	cout << name << " #" << t << endl;
+	for (int i = 1; i < 6; ++i)
+	{
+		for (int j = 1; j < 7; ++j)
+			cout << GetBit(results[i], j) << " ";
+		cout << endl;
+	}
+}
+void Ouput8BitChar(const char &c)
+{        
+    for(int i=0; i<8; ++i)
     {
-        for (int i = 0; i < 3; i++)
-        {
-            cin >> Left[i] >> Right[i] >> Result[i];
-        }
-        for (char x = 'A'; x < 'M'; ++x)
-        {
-            if (IsFake(x, true))
-            {
-                cout << x << " is the counterfeit coin and it is light." << endl;
-                break;
-            }
-            else if (IsFake(x, false))
-            {
-                cout << x << " is the counterfeit coin and it is heavy." << endl;
-                break;
-            }
-        }
+        cout<<GetBit(c, i);
     }
-
-    return 0;
+    cout<<endl;
 }
 
-bool IsFake(char x, bool isLight)
+
+/*
+
+*/
+int main()
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        char *pLeftCoins, *pRightCoins; //天平座 左右两边；
-        if (isLight)
-        { //第一种：假设假币isLight, 那么可以进入switch分情况讨论。
-            pLeftCoins = Left[i];
-            pRightCoins = Right[i];
-        }
-        else
-        { //第二种:如果假币!isLight，将左右对调，对调完毕后，switch的讨论依然有效。
-            pLeftCoins = Right[i];
-            pRightCoins = Left[i];
-        }
-        switch (Result[i][0])
-        {
-        case 'e':
-            //如果天平平衡，那么天平左右两边应该都没有假币，如果假设的x能在左边或者右边找到，那么假设是错误的。
-            if (strchr(pLeftCoins, x) || (strchr(pRightCoins, x)))
-                return false;
-            break;
+	int T, t = 1;
+	cin >> T;
+	while (t <= T)
+	{
+		memset(oriLights,0,sizeof(oriLights));
+		for (int i = 1; i < 6; ++i)
+		{
+			for (int j = 1; j < 7; ++j)
+			{
+				int s;
+				cin >> s;
+				SetBit(oriLights[i], j, s);
+			}
+		}
+		OutputResults(t, oriLights, "originalLights");
 
-        case 'u':
-            //如果天平右端向上，而假币是light的，那么假币应该在右边，如果右边找不到，那么假设是错误的。
-            if (strchr(pRightCoins, x) == NULL)
-                return false;
-            break;
+      
 
-        case 'd':
-            //如果天平有端向下，而假币不是light的，那么假币应该在左边，如果左边找不到，那么假设是错误的。
-            if (strchr(pLeftCoins, x) == NULL)
-                return false;
-            break;
-        default:
-            break;
-        }
-    }
-    //如果循环结束，说明假设成立。
-    return true;
+		for (int n = 0; n < 64; ++n)//第一行开关的64中情况。
+		{
+			int switches = (n << 1);//将n左移一位，第1行开关状态。1-6为每个开关的下标。
+            //Ouput8BitChar(switches);
+			memcpy(lights, oriLights, sizeof(oriLights));//灯的初始状态。
+			for (int i = 1; i < 6; ++i)
+			{
+				result[i] = switches;//第i行开关的状态；
+                cout<<i<<endl;
+				for (int j = 1; j < 7; ++j)//遍历第i行开关状态。
+				{//i=1时 switches[1:6] = 000001,
+					if (GetBit(switches, j))//如果第i行的的第j个按下，反转周围灯的效果。
+					{
+						FlipBit(lights[i], j);
+						FlipBit(lights[i], j - 1);
+						FlipBit(lights[i], j + 1);
+						FlipBit(lights[i - 1], j);
+						FlipBit(lights[i + 1], j);
+					}
+                    //cout<<j<<" : ";
+                    //Ouput8BitChar(lights[5]);
+				}
+
+             
+				switches = lights[i];// 本行的亮灯状态，应该位下一行开关需要按下的结果。	
+			}
+			if(lights[5]&126==0) //与01111110进行位运算，如果结果位0，说明第5列灯都是灭掉的。
+			    OutputResults(n, lights, "Result");
+		}
+
+
+		t++;
+	}
+	return 0;
 }
