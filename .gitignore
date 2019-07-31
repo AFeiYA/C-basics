@@ -5,3 +5,4 @@ main.exe
 *.db
 .vs/ProjectSettings.json
 .vs/VSWorkspaceState.json
+tempCodeRunnerFile.cpp
