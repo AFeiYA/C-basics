@@ -1,110 +1,114 @@
 #include <iostream>
-#include <string>
-#include <bitset>
-
 using namespace std;
 /*
 Algorithm
 枚举
-001:特殊密码锁
-
-总时间限制: 1000ms 内存限制: 1024kB
+002:拨钟问题
+查看 提交 统计 提问
+总时间限制: 1000ms 内存限制: 65536kB
 描述
-有一种特殊的二进制密码锁，由n个相连的按钮组成（n<30），按钮有凹/凸两种状态，用手按按钮会改变其状态。
+有9个时钟，排成一个3*3的矩阵。
 
-然而让人头疼的是，当你按一个按钮时，跟它相邻的两个按钮状态也会反转。当然，如果你按的是最左或者最右边的按钮，该按钮只会影响到跟它相邻的一个按钮。
+|-------|    |-------|    |-------|
+|       |    |       |    |   |   |
+|---O   |    |---O   |    |   O   |
+|       |    |       |    |       |
+|-------|    |-------|    |-------|
+    A            B            C    
 
-当前密码锁状态已知，需要解决的问题是，你至少需要按多少次按钮，才能将密码锁转变为所期望的目标状态。
+|-------|    |-------|    |-------|
+|       |    |       |    |       |
+|   O   |    |   O   |    |   O   |
+|   |   |    |   |   |    |   |   |
+|-------|    |-------|    |-------|
+    D            E            F    
 
+|-------|    |-------|    |-------|
+|       |    |       |    |       |
+|   O   |    |   O---|    |   O   |
+|   |   |    |       |    |   |   |
+|-------|    |-------|    |-------|
+    G            H            I    
+(图 1)
+现在需要用最少的移动，将9个时钟的指针都拨到12点的位置。共允许有9种不同的移动。如下表所示，每个移动会将若干个时钟的指针沿顺时针方向拨动90度。
+
+
+
+移动    影响的时钟
+ 
+ 1         ABDE
+ 2         ABC
+ 3         BCEF
+ 4         ADG
+ 5         BDEFH
+ 6         CFI
+ 7         DEGH
+ 8         GHI
+ 9         EFHI    
 输入
-两行，给出两个由0、1组成的等长字符串，表示当前/目标密码锁状态，其中0代表凹，1代表凸。
+9个整数，表示各时钟指针的起始位置，相邻两个整数之间用单个空格隔开。其中，0=12点、1=3点、2=6点、3=9点。
 输出
-至少需要进行的按按钮操作次数，如果无法实现转变，则输出impossible。
+输出一个最短的移动序列，使得9个时钟的指针都指向12点。按照移动的序号从小到大输出结果。相邻两个整数之间用单个空格隔开。
 样例输入
-00111  a:001000 110000 000000
-00000
-111  //100 011 101
-101
+3 3 0 
+2 2 2 
+2 1 2 
 样例输出
-3
+4 5 8 9 
  */
- //
-#define N  30
+
+int clocks[10], i[10], sum; //钟表[A-I对应1-9]，操作[A-I:每个按下的次数]，操作步数总和。
 
 int main()
 {
-	string inputString, targetString;
+	for (int i = 1; i <= 9; ++i)
+		cin >> clocks[i];
 
+	// for (int j = 1; j <= 9; ++j)
+	// 	cout << j << " " << clocks[j] << "\t";
+	// cout << endl;
 
-	cin >> inputString;
-	cin >> targetString;
-	bitset<N> checkResult;
-	bitset<N> checkResult2;
-	bitset<N> inputState(inputString);
-	bitset<N> inputState2(inputString);
-	bitset<N> targetState(targetString);
-	int inputLength = inputString.size();
+	// for (int i = 1; i <= 9; ++i)
+	// 	cout << (4 - clocks[i] % 4) % 4; //clocks[i]归零要被开关控制的最少次数。
 
-	int n = 1;
-	//如果按下了第一个开关：
-	inputState.flip(0);
-	inputState.flip(1);
-	for (int i = 0; i < inputLength-1; ++i)
-	{
-		if (inputState[i] != targetState[i])//如果i不满足，需要按下i后面的按钮i+1。
-		{
-			n++;
-			if (i < inputLength - 2)//按下i+1个开关
+	//枚举1，2 3的移动方案，总共有4^3种状态。
+	for (i[1] = 0; i[1] < 4; i[1]++)
+		for (i[2] = 0; i[2] < 4; i[2]++)
+			for (i[3] = 0; i[3] < 4; i[3]++)
 			{
-				inputState.flip(i);
-				inputState.flip(i + 1);
-				inputState.flip(i + 2);
+				//clock[1]的当前值为：
+				//clock[1] 的状态为初始状态 + 方案1按下的次数+方案2按下的次数,
+				//也即：clock[1]+i[1]+i[2]，而4 5 6的移动方案，只有4能调整clocks[1]，也即钟表A。
+				//因此，将钟表A，也即clocks调整为0，4的开关方案是
+				i[4] = (4 - (clocks[1] + i[1] + i[2]) % 4) % 4;
+				//同理,只有5能调节钟表B
+				i[5] = (4 - (clocks[2] + i[1] + i[2] + i[3]) % 4) % 4;
+				//调节钟表C
+				i[6] = (4 - (clocks[3] + i[2] + i[3]) % 4) % 4;
+				//调节钟表D
+				i[7] = (4 - (clocks[4] + i[1] + i[4] + i[5]) % 4) % 4;
+				//由于9控制F是唯一的。因此，选择调节F
+				i[9] = (4 - (clocks[6] + i[3] + i[5] + i[6]) % 4) % 4;
+				//调节H
+				i[8] = (4 - (clocks[8] + i[5] + i[7] + i[9]) % 4) % 4;
+				sum = 0;
+				sum += (clocks[1] + i[1] + i[2] + i[4]) % 4;
+				sum += (clocks[2] + i[1] + i[2] + i[3] + i[5]) % 4;
+				sum += (clocks[3] + i[2] + i[3] + i[6]) % 4;
+				sum += (clocks[4] + i[1] + i[4] + i[5] + i[7]) % 4;
+				sum += (clocks[5] + i[1] + i[3] + i[5] + i[7] + i[9]) % 4;
+				sum += (clocks[6] + i[3] + i[5] + i[6] + i[9]) % 4;
+				sum += (clocks[7] + i[4] + i[7] + i[8]) % 4;
+				sum += (clocks[8] + i[5] + i[7] + i[8] + i[9]) % 4;
+				sum += (clocks[9] + i[6] + i[8] + i[9]) % 4;
+				if (sum == 0)
+				{
+					for (int j = 1; j <= 9; j++)
+						while (i[j]--)
+							cout << j << " ";
+					return 0;
+				}
 			}
-			else//按下最后一个开关。
-			{
-				inputState.flip(i);
-				inputState.flip(i + 1);
-			}
-		}
-	}
-	checkResult = inputState ^ targetState;
 
-
-	//如果没有按下第一个开关
-	int m = 0;
-	for (int i = 0; i < inputLength - 1; ++i)
-	{
-		if (inputState2[i] != targetState[i])//如果i不满足，需要按下i后面的按钮i+1。
-		{
-			m++;
-			if (i < inputLength - 2)//按下i+1个开关
-			{
-				inputState2.flip(i);
-				inputState2.flip(i + 1);
-				inputState2.flip(i + 2);
-			}
-			else//按下最后一个开关。
-			{
-				inputState2.flip(i);
-				inputState2.flip(i + 1);
-			}
-		}
-	}
-	checkResult2 = inputState2 ^ targetState;
-
-
-	if (checkResult == 0 && checkResult2 != 0)
-		cout << n << endl;
-	if (checkResult != 0 && checkResult2==0)
-		cout << m << endl;
-	if (checkResult == 0 && checkResult2 == 0)
-	{
-		if (n < m)
-			cout << n << endl;
-		else
-			cout<<m<<endl;
-	}
-	if (checkResult != 0 && checkResult2 != 0)
-		cout << "impossible" << endl;
 	return 0;
 }
