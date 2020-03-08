@@ -6,3 +6,4 @@ main.exe
 .vs/ProjectSettings.json
 .vs/VSWorkspaceState.json
 tempCodeRunnerFile.cpp
+*.exe
