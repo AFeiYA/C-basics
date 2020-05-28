@@ -7,3 +7,4 @@ main.exe
 .vs/VSWorkspaceState.json
 tempCodeRunnerFile.cpp
 *.exe
+.vscode/
